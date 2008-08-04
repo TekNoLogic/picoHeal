@@ -1,0 +1,20 @@
+3.0.9.6-Beta
+    Ignore "target" for UNIT_PET
+    Add debug output for this blasted UNIT_PET error
+
+3.0.3.5-Beta
+    Don't show pet in tooltip
+    Fix pet damage not being counted if pet isn't out on login
+
+3.0.3.4-Beta
+    LDB type
+
+3.0.3.3-Beta
+    tektip!
+
+3.0.1.2-Beta
+    Add click to reset
+
+3.0.1.1-Beta
+    And so it begins...
+
