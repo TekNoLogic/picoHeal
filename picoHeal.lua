@@ -17,8 +17,10 @@ function f:PLAYER_LOGIN()
 	unitnames[pID] = "|cff"..colors[select(2, UnitClass("player"))]..UnitName("player").."|r"
 
 	self:PARTY_MEMBERS_CHANGED()
+	self:RAID_ROSTER_UPDATE()
 
 	self:RegisterEvent("PARTY_MEMBERS_CHANGED")
+	self:RegisterEvent("RAID_ROSTER_UPDATE")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 
 	self:UnregisterEvent("PLAYER_LOGIN")
@@ -27,9 +29,17 @@ end
 
 
 function f:PARTY_MEMBERS_CHANGED()
-	for i=1,4 do
+	for i=1,GetNumPartyMembers() do
 		local id = UnitGUID("party"..i)
-		if id then unitnames[id] = "|cff"..colors[select(2, UnitClass("party"..i)) or "PRIEST"]..UnitName("party"..i).."|r" end
+		if id and not unitnames[id] then unitnames[id] = "|cff"..colors[select(2, UnitClass("party"..i)) or "PRIEST"]..UnitName("party"..i).."|r" end
+	end
+end
+
+
+function f:RAID_ROSTER_UPDATE()
+	for i=1,GetNumRaidMembers() do
+		local id = UnitGUID("raid"..i)
+		if id and not unitnames[id] then unitnames[id] = "|cff"..colors[select(2, UnitClass("raid"..i)) or "PRIEST"]..UnitName("raid"..i).."|r" end
 	end
 end
 
