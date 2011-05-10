@@ -44,7 +44,7 @@ function f:RAID_ROSTER_UPDATE()
 end
 
 
-function f:COMBAT_LOG_EVENT_UNFILTERED(_, eventtype, id, source, sourceflags, guidtarget, target, targetflags, spellid, spellname, spellschool, healed, overheal, wascrit)
+function f:COMBAT_LOG_EVENT_UNFILTERED(_, eventtype, hidecaster, id, source, sourceflags, sourceraidflags, guidtarget, target, targetflags, targetraidflags, spellid, spellname, spellschool, healed, overheal, wascrit)
 	if eventtype ~= "SPELL_HEAL" and eventtype ~= "SPELL_PERIODIC_HEAL" then return end
 
 	if unitnames[id] then healedTotal[id], overhealTotal[id] = (healedTotal[id] or 0) + healed, (overhealTotal[id] or 0) + overheal end
