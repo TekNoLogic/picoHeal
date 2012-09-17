@@ -16,11 +16,9 @@ function f:PLAYER_LOGIN()
 	pID = UnitGUID("player")
 	unitnames[pID] = "|cff"..colors[select(2, UnitClass("player"))]..UnitName("player").."|r"
 
-	self:PARTY_MEMBERS_CHANGED()
-	self:RAID_ROSTER_UPDATE()
+	self:GROUP_MEMBERS_CHANGED()
 
-	self:RegisterEvent("PARTY_MEMBERS_CHANGED")
-	self:RegisterEvent("RAID_ROSTER_UPDATE")
+	self:RegisterEvent("GROUP_MEMBERS_CHANGED")
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 
 	self:UnregisterEvent("PLAYER_LOGIN")
@@ -28,28 +26,33 @@ function f:PLAYER_LOGIN()
 end
 
 
-function f:PARTY_MEMBERS_CHANGED()
-	for i=1,GetNumPartyMembers() do
+function f:GROUP_MEMBERS_CHANGED()
+	for i=1,GetNumSubgroupMembers() do
 		local id = UnitGUID("party"..i)
-		if id and not unitnames[id] then unitnames[id] = "|cff"..colors[select(2, UnitClass("party"..i)) or "PRIEST"]..UnitName("party"..i).."|r" end
+		if id and not unitnames[id] then
+			local _, color = UnitClass("party"..i)
+			color = colors[color or "PRIEST"]
+			unitnames[id] = "|cff"..color..UnitName("party"..i).."|r"
+		end
 	end
-end
-
-
-function f:RAID_ROSTER_UPDATE()
-	for i=1,GetNumRaidMembers() do
+	for i=1,GetNumGroupMembers() do
 		local id = UnitGUID("raid"..i)
-		if id and not unitnames[id] then unitnames[id] = "|cff"..colors[select(2, UnitClass("raid"..i)) or "PRIEST"]..UnitName("raid"..i).."|r" end
+		if id and not unitnames[id] then
+			local _, color = UnitClass("raid"..i)
+			color = colors[color or "PRIEST"]
+			unitnames[id] = "|cff"..color..UnitName("raid"..i).."|r"
+		end
 	end
 end
 
 
-function f:COMBAT_LOG_EVENT_UNFILTERED(_, eventtype, hidecaster, id, source, sourceflags, guidtarget, target, targetflags, spellid, spellname, spellschool, healed, overheal, wascrit)
--- function f:COMBAT_LOG_EVENT_UNFILTERED(_, eventtype, hidecaster, id, source, sourceflags, sourceraidflags, guidtarget, target, targetflags, targetraidflags, spellid, spellname, spellschool, healed, overheal, wascrit)
-	if eventtype ~= "SPELL_HEAL" and eventtype ~= "SPELL_PERIODIC_HEAL" then return end
+function f:COMBAT_LOG_EVENT_UNFILTERED(timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, ...)
+	if event ~= "SPELL_HEAL" and event ~= "SPELL_PERIODIC_HEAL" then return end
 
-	if unitnames[id] then healedTotal[id], overhealTotal[id] = (healedTotal[id] or 0) + healed, (overhealTotal[id] or 0) + overheal end
-	if id == pID then obj.text = string.format("%d%% OH", 100*(overhealTotal[pID] or 0)/(healedTotal[pID] or 1)) end
+	local spellId, spellName, spellSchool, amount, overheal, critical = ...
+
+	if unitnames[sourceGUID] then healedTotal[sourceGUID], overhealTotal[sourceGUID] = (healedTotal[sourceGUID] or 0) + amount, (overhealTotal[sourceGUID] or 0) + overheal end
+	if sourceGUID == pID then obj.text = string.format("%d%% OH", 100*(overhealTotal[pID] or 0)/(healedTotal[pID] or 1)) end
 end
 
 
